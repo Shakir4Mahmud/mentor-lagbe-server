@@ -2,6 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { connectDB } from "./config/db";
 import testRoutes from "./routes/test.routes";
+import tuitionRoutes from "./routes/tuition.routes";
 
 const app = express();
 
@@ -33,6 +34,9 @@ app.get("/api/health", async (req: Request, res: Response) => {
 
 // Temporary test routes
 app.use("/api/test", testRoutes);
+
+// Tuition routes
+app.use("/api/tuitions", tuitionRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
