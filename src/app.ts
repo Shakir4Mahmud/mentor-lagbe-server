@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { connectDB } from "./config/db";
+import testRoutes from "./routes/test.routes";
 
 const app = express();
 
@@ -19,7 +20,7 @@ app.get("/", (req: Request, res: Response) => {
   res.json({ message: "MentorLagbe server is running" });
 });
 
-// Health check (database connected kina dekhar jonno)
+// Health check
 app.get("/api/health", async (req: Request, res: Response) => {
   try {
     const db = await connectDB();
@@ -29,6 +30,9 @@ app.get("/api/health", async (req: Request, res: Response) => {
     res.status(500).json({ status: "error", database: "not connected" });
   }
 });
+
+// Temporary test routes
+app.use("/api/test", testRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
