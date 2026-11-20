@@ -6,6 +6,7 @@ import tuitionRoutes from "./routes/tuition.routes";
 import statsRoutes from "./routes/stats.routes";
 import applicationRoutes from "./routes/application.routes";
 import bookmarkRoutes from "./routes/bookmark.routes";
+import tutorRoutes from "./routes/tutor.routes";
 
 const app = express();
 
@@ -49,6 +50,9 @@ app.use("/api/applications", applicationRoutes);
 
 // Bookmark routes
 app.use("/api/bookmarks", bookmarkRoutes);
+
+// Tutor routes (stats, applicants)
+app.use("/api/tutor", tutorRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
