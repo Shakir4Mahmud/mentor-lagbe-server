@@ -1,7 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import { connectDB } from "./config/db";
-import testRoutes from "./routes/test.routes";
 import tuitionRoutes from "./routes/tuition.routes";
 import statsRoutes from "./routes/stats.routes";
 import applicationRoutes from "./routes/application.routes";
@@ -37,9 +36,6 @@ app.get("/api/health", async (req: Request, res: Response) => {
     res.status(500).json({ status: "error", database: "not connected" });
   }
 });
-
-// Temporary test routes
-app.use("/api/test", testRoutes);
 
 // Tuition routes
 app.use("/api/tuitions", tuitionRoutes);
