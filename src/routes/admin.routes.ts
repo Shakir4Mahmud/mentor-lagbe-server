@@ -271,4 +271,113 @@ router.patch(
   }
 );
 
+// GET /api/admin/tuitions  (tutor der post kora shob tuition)
+router.get(
+  "/tuitions",
+  verifyToken,
+  verifyAdmin,
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const tuitions = await tuitionsCollection();
+
+      const list = await tuitions.find({}).sort({ createdAt: -1 }).toArray();
+
+      const result = [];
+      for (let i = 0; i < list.length; i++) {
+        const item = list[i];
+        result.push({ ...item, _id: item._id.toString() });
+      }
+
+      res.json({ tuitions: result });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to load tuitions" });
+    }
+  }
+);
+
+// PATCH /api/admin/tuitions/:id/approval  (approve ba reject)
+router.patch(
+  "/tuitions/:id/approval",
+  verifyToken,
+  verifyAdmin,
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const id = String(req.params.id);
+      if (!ObjectId.isValid(id)) {
+        res.status(400).json({ message: "Invalid tuition id" });
+        return;
+      }
+
+      const status = String(req.body.status || "");
+      if (status !== "approved" && status !== "rejected") {
+        res
+          .status(400)
+          .json({ message: "Status must be approved or rejected" });
+        return;
+      }
+
+      const tuitions = await tuitionsCollection();
+      const existing = await tuitions.findOne({ _id: new ObjectId(id) });
+
+      if (!existing) {
+        res.status(404).json({ message: "Tuition not found" });
+        return;
+      }
+
+      await tuitions.updateOne(
+        { _id: new ObjectId(id) },
+        { $set: { approvalStatus: status, reviewedAt: new Date() } }
+      );
+
+      res.json({ message: "Tuition " + status });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update tuition" });
+    }
+  }
+);
+
+// GET /api/admin/transactions  (Stripe payment record)
+router.get(
+  "/transactions",
+  verifyToken,
+  verifyAdmin,
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const payments = await paymentsCollection();
+
+      const list = await payments.find({}).sort({ paidAt: -1 }).toArray();
+
+      let totalRevenue = 0;
+      let studentCount = 0;
+      let tutorCount = 0;
+
+      const result = [];
+      for (let i = 0; i < list.length; i++) {
+        const item = list[i];
+
+        totalRevenue = totalRevenue + Number(item.amount);
+
+        if (item.userRole === "student") {
+          studentCount = studentCount + 1;
+        }
+        if (item.userRole === "tutor") {
+          tutorCount = tutorCount + 1;
+        }
+
+        result.push({ ...item, _id: item._id.toString() });
+      }
+
+      res.json({
+        payments: result,
+        totalRevenue: totalRevenue,
+        totalTransactions: list.length,
+        studentCount: studentCount,
+        tutorCount: tutorCount,
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to load transactions" });
+    }
+  }
+);
+
 export default router;

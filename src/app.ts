@@ -8,6 +8,7 @@ import bookmarkRoutes from "./routes/bookmark.routes";
 import tutorRoutes from "./routes/tutor.routes";
 import adminRoutes from "./routes/admin.routes";
 import paymentRoutes from "./routes/payment.routes";
+import reviewRoutes from "./routes/review.routes";
 
 const app = express();
 
@@ -57,6 +58,9 @@ app.use("/api/admin", adminRoutes);
 
 // Payment routes (Stripe checkout and verify)
 app.use("/api/payments", paymentRoutes);
+
+// Review routes (student rating and feedback)
+app.use("/api/reviews", reviewRoutes);
 
 // 404 handler
 app.use((req: Request, res: Response) => {
